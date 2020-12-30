@@ -27,3 +27,19 @@ Conv2d 1×1 the number of output channels等于960和1280的层，平均池化�
 
 mobilenetv3small版本<br>
 网络从开头截取到hs2(bn2)<br>
+
+此repo代码中GFocalV2未完全更改完成，如要实现请[参考](https://github.com/implus/GFocalV2)。
+
+## Muchas gracias.
+
+https://github.com/huawei-noah/ghostnet
+
+https://github.com/xiaolai-sqlai/mobilenetv3
+
+https://github.com/RangiLyu/nanodet
+
+https://github.com/ultralytics/yolov5
+
+https://github.com/implus/GFocal
+
+https://github.com/implus/GFocalV2
