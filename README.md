@@ -4,17 +4,17 @@ GhostNet + PAN + GFL<br>
 Single-GPU<br>
 quarkdet.yml config example<br>
 device:<br>
-  gpu_ids: [0]<br>
+&emsp; gpu_ids: [0]<br>
 ```
-python tools/train.py config/quarkdet.yml<br> 
+python tools/train.py config/quarkdet.yml
 ```
 Multi-GPU<br>
 quarkdet.yml config example<br>
 device:<br>
-  gpu_ids: [0,1]<br>
+&emsp; gpu_ids: [0,1]<br>
 
 ```
-python -m torch.distributed.launch --nproc_per_node=2 --master_port 30001 tools/train.py config/quarkdet.yml<br>
+python -m torch.distributed.launch --nproc_per_node=2 --master_port 30001 tools/train.py config/quarkdet.yml
 ```
 backbone 支持 mobilenetv3, shufflenetv2, ghostnet<br>
 neck 支持 FPN,PAN（卷积）<br>
