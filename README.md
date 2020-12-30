@@ -1,4 +1,5 @@
-# quarkdet object detection
+# quarkdet 
+weightlight object detection<br>
 GhostNet + PAN + GFL<br>
 
 Single-GPU<br>
@@ -36,7 +37,7 @@ https://github.com/huawei-noah/ghostnet
 
 https://github.com/xiaolai-sqlai/mobilenetv3
 
-https://github.com/RangiLyu/nanodet
+https://github.com/RangiLyu/nanodet  (特别感谢)
 
 https://github.com/ultralytics/yolov5
 
