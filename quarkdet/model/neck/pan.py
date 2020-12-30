@@ -92,7 +92,7 @@ class PAN(FPN):
         for i in range(used_backbone_levels - 1, 0, -1):   #i=[2,1]
             prev_shape = laterals[i - 1].shape[2:]
             laterals[i - 1] += F.interpolate(
-                laterals[i], size=prev_shape, mode='bilinear')
+                laterals[i], size=prev_shape, mode='bilinear',align_corners=True)
 
         # part 1: from original levels
 

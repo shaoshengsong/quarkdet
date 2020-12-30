@@ -17,3 +17,12 @@ class Pipeline:
         meta = self.warp(meta=meta, dst_shape=dst_shape)
         meta = self.color(meta=meta)
         return meta
+    
+    
+    
+    
+#经过两个数据增强，重要的是参数是否配置，如果配置则启用，不配置不启用，程序中首先判断参数是否存在
+# functools.partial(func, /, *args, **keywords)
+# Return a new partial object which when called will behave like func called with the positional arguments args and keyword arguments keywords. 
+# If more arguments are supplied to the call, they are appended to args. 
+# If additional keyword arguments are supplied, they extend and override keywords. 

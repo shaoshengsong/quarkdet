@@ -1,3 +1,12 @@
+from torchsummary import summary
+import sys
+sys.path.append("./")
+from quarkdet.evaluator import build_evaluator
+from quarkdet.model.detector import build_model
+from quarkdet.data.dataset import build_dataset
+from quarkdet.data.collate import custom_collate_function
+from quarkdet.trainer import build_trainer
+from quarkdet.util import mkdir, Logger, cfg, load_config
 import os
 import torch
 import logging
@@ -5,16 +14,8 @@ import argparse
 import numpy as np
 import torch.distributed as dist
 
-import sys  
-sys.path.append("./") 
-                
-from quarkdet.util import mkdir, Logger, cfg, load_config
-from quarkdet.trainer import build_trainer
-from quarkdet.data.collate import collate_function
-from quarkdet.data.dataset import build_dataset
-from quarkdet.model.detector import build_model
-from quarkdet.evaluator import build_evaluator
-from torchsummary import summary 
+
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -40,7 +41,8 @@ def init_seeds(seed=0):
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
 
-
+def collate_fn_coco(batch):
+    return tuple(zip(*batch)) 
 def main(args):
     load_config(cfg, args.config)
     local_rank = int(args.local_rank)
@@ -54,18 +56,15 @@ def main(args):
 
     logger.log('Creating model...')
     model = build_model(cfg.model)
-   
-    print("model:",model)
 
-    
-    #pre_dict = model.state_dict() #按键值对将模型参数加载到pre_dict
-    #for k, v in pre_dict.items(): # 打印模型参数
+    print("model:", model)
+
+    # pre_dict = model.state_dict() #按键值对将模型参数加载到pre_dict
+    # for k, v in pre_dict.items(): # 打印模型参数
     # for k, v in pre_dict.items(): #打印模型每层命名
-    #     print ('%-50s%s' %(k,v.shape)) 
+    #     print ('%-50s%s' %(k,v.shape))
 
-    summary(model, (3, 320, 320))
-
-
+    #summary(model, (3, 320, 320))
 
     logger.log('Setting up data...')
     train_dataset = build_dataset(cfg.data.train, 'train')
@@ -76,27 +75,29 @@ def main(args):
         num_gpus = torch.cuda.device_count()
         torch.cuda.set_device(local_rank % num_gpus)
         dist.init_process_group(backend='nccl')
-        train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
+        train_sampler = torch.utils.data.distributed.DistributedSampler(
+            train_dataset)
         train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=cfg.device.batchsize_per_gpu,
                                                        num_workers=cfg.device.workers_per_gpu, pin_memory=True,
-                                                       collate_fn=collate_function, sampler=train_sampler,
+                                                       collate_fn=custom_collate_function, sampler=train_sampler,
                                                        drop_last=True)
     else:
+
         train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=cfg.device.batchsize_per_gpu,
-                                                       shuffle=True, num_workers=cfg.device.workers_per_gpu,
-                                                       pin_memory=True, collate_fn=collate_function, drop_last=True)
+                                                       shuffle=True,collate_fn=custom_collate_function,
+
+                                                       pin_memory=True, drop_last=True)
+
 
     val_dataloader = torch.utils.data.DataLoader(val_dataset, batch_size=1, shuffle=False, num_workers=1,
-                                                 pin_memory=True, collate_fn=collate_function, drop_last=True)
+                                                 pin_memory=True, collate_fn=custom_collate_function, drop_last=True)
 
     trainer = build_trainer(local_rank, cfg, model, logger)
-
-
 
     if cfg.schedule.resume:
         trainer.resume(cfg)
         if 'load_model' in cfg.schedule:
-                trainer.load_model(cfg)
+            trainer.load_model(cfg)
 
     evaluator = build_evaluator(cfg, val_dataset)
 

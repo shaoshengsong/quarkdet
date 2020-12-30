@@ -3,11 +3,13 @@ import torch.nn as nn
 
 from ..module.conv import ConvModule, DepthwiseConvModule
 from ..module.init_weights import normal_init
+#from .gfl_head import GFLHead
+from .gfl_headv2 import GFLHeadV2
 from .gfl_head import GFLHead
 from .anchor.anchor_target import multi_apply
 
 
-class QuarkDetHead(GFLHead):
+class QuarkDetHead(GFLHeadV2):
     """
     Modified from GFL, use same loss functions but much lightweight convolution heads
     """
@@ -60,9 +62,9 @@ class QuarkDetHead(GFLHead):
     def _buid_not_shared_head(self):
         cls_convs = nn.ModuleList()
         reg_convs = nn.ModuleList()
-        print("cls_convs before:",cls_convs)
-        print("reg_convs before:",reg_convs)
-        print("self.stacked_convs:",self.stacked_convs)
+        # print("cls_convs before:",cls_convs)
+        # print("reg_convs before:",reg_convs)
+        # print("self.stacked_convs:",self.stacked_convs)
         for i in range(self.stacked_convs):
             chn = self.in_channels if i == 0 else self.feat_channels
             cls_convs.append(
@@ -85,8 +87,8 @@ class QuarkDetHead(GFLHead):
                                         bias=self.norm_cfg is None,
                                         activation=self.activation))
                 
-        print("cls_convs after:",cls_convs)
-        print("reg_convs after:",reg_convs)
+        # print("cls_convs after:",cls_convs)
+        # print("reg_convs after:",reg_convs)
         return cls_convs, reg_convs
 
     def init_weights(self):
@@ -102,7 +104,7 @@ class QuarkDetHead(GFLHead):
         for i in range(len(self.anchor_strides)):
             normal_init(self.gfl_cls[i], std=0.01, bias=bias_cls)
             normal_init(self.gfl_reg[i], std=0.01)
-        print('Finish initialize Lite GFL Head.')
+        print('Finish initialize Lite quarkdet Head.')
 
     def forward(self, feats):
         return multi_apply(self.forward_single,
@@ -122,7 +124,12 @@ class QuarkDetHead(GFLHead):
             reg_feat = reg_conv(reg_feat)
         if self.share_cls_reg:
             feat = gfl_cls(cls_feat)
+            # print("feat:",feat.shape)
+            # print("cls_feat:",cls_feat.shape)
+            # print("self.cls_out_channels:",self.cls_out_channels)
             cls_score, bbox_pred = torch.split(feat, [self.cls_out_channels, 4 * (self.reg_max + 1)], dim=1)
+            # print("cls_score:",cls_score.shape)
+            # print("bbox_pred:",bbox_pred.shape)
         else:
             cls_score = gfl_cls(cls_feat)
             bbox_pred = gfl_reg(reg_feat)

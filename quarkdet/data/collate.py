@@ -13,17 +13,17 @@ default_collate_err_msg_format = (
     "dicts or lists; found {}")
 
 
-def collate_function(batch):
+def custom_collate_function(batch):
     r"""Puts each data field into a tensor with outer dimension batch size"""
 
     elem = batch[0]
     elem_type = type(elem)
     if isinstance(elem, torch.Tensor):
         out = None
-        # TODO: support pytorch < 1.3
+
         # if torch.utils.data.get_worker_info() is not None:
-        #     # If we're in a background process, concatenate directly into a
-        #     # shared memory tensor to avoid an extra copy
+        # #     # If we're in a background process, concatenate directly into a
+        # #     # shared memory tensor to avoid an extra copy
         #     numel = sum([x.numel() for x in batch])
         #     storage = elem.storage()._new_shared(numel)
         #     out = elem.new(storage)
@@ -36,7 +36,7 @@ def collate_function(batch):
             if np_str_obj_array_pattern.search(elem.dtype.str) is not None:
                 raise TypeError(default_collate_err_msg_format.format(elem.dtype))
 
-            # return collate_function([torch.as_tensor(b) for b in batch])
+            # return custom_collate_function([torch.as_tensor(b) for b in batch])
             return batch
         elif elem.shape == ():  # scalars
             # return torch.as_tensor(batch)
@@ -48,11 +48,11 @@ def collate_function(batch):
     elif isinstance(elem, string_classes):
         return batch
     elif isinstance(elem, container_abcs.Mapping):
-        return {key: collate_function([d[key] for d in batch]) for key in elem}
+        return {key: custom_collate_function([d[key] for d in batch]) for key in elem}
     elif isinstance(elem, tuple) and hasattr(elem, '_fields'):  # namedtuple
-        return elem_type(*(collate_function(samples) for samples in zip(*batch)))
+        return elem_type(*(custom_collate_function(samples) for samples in zip(*batch)))
     elif isinstance(elem, container_abcs.Sequence):
         transposed = zip(*batch)
-        return [collate_function(samples) for samples in transposed]
+        return [custom_collate_function(samples) for samples in transposed]
 
     raise TypeError(default_collate_err_msg_format.format(elem_type))

@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 import math
 
+#PyTorch已经有现成的函数来替代
 def get_flip_matrix(prob=0.5):
     F = np.eye(3)
     if random.random() < prob:

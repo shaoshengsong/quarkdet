@@ -51,13 +51,17 @@ class AnchorHead(nn.Module):
         self.target_means = target_means
         self.target_stds = target_stds
 
-        self.use_sigmoid_cls = use_sigmoid
+        self.use_sigmoid_cls =  use_sigmoid #loss.get('use_sigmoid', False) #use_sigmoid
+        #self.use_sigmoid_cls = loss_cls.get('use_sigmoid', False)
         # self.sampling = self.loss_cfg.loss_cls['name'] not in ['FocalLoss', 'GHMC']
         if self.use_sigmoid_cls:
             self.cls_out_channels = num_classes
         else:
             self.cls_out_channels = num_classes + 1
-
+            
+         
+  
+        print("self.cls_out_channels:",self.cls_out_channels)
         if self.cls_out_channels <= 0:
             raise ValueError('num_classes={} is too small'.format(num_classes))
 

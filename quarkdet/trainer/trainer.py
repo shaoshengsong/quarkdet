@@ -79,7 +79,7 @@ class Trainer:
         results = {}
         epoch_losses = {}
         step_losses = {}
-        num_iters = len(data_loader)
+        num_iters = len(data_loader) #test santiago 
         for iter_id, meta in enumerate(data_loader):
             if iter_id >= num_iters:
                 break
@@ -185,7 +185,9 @@ class Trainer:
         num_iters = self.cfg.schedule.warmup.steps
         cur_iter = 0
         while cur_iter < num_iters:
+            #for iter_id, batch in enumerate(data_loader):
             for iter_id, batch in enumerate(data_loader):
+   
                 cur_iter += 1
                 if cur_iter >= num_iters:
                     break

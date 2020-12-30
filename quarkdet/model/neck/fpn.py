@@ -96,7 +96,7 @@ class FPN(nn.Module):
         for i in range(used_backbone_levels - 1, 0, -1):
             prev_shape = laterals[i - 1].shape[2:]
             laterals[i - 1] += F.interpolate(
-                laterals[i], size=prev_shape, mode='bilinear')
+                laterals[i], size=prev_shape, mode='bilinear',align_corners=True)
 
         # build outputs
         # outs = [

@@ -44,11 +44,35 @@ def hard_sigmoid(x, inplace: bool = False):
     else:
         return F.relu6(x + 3.) / 6.
 
+#---------------------------------------------------------------------
+
+def get_ld_dct(i, freq, L):
+    result = math.cos(math.pi * freq * (i + 0.5) / L)
+    if freq == 0:
+        return result
+    else:
+        return result * math.sqrt(2)
+
+def get_dct_weights(width, height, channel, fidx_u, fidx_v):
+    dct_weights = torch.zeros(1, channel, width, height)
+
+    # split channel for multi-spectral attention
+    c_part = channel // len(fidx_u)
+
+    for i, (u_x, v_y) in enumerate(zip(fidx_u, fidx_v)):
+        for t_x in range(width):
+            for t_y in range(height):
+                val = get_ld_dct(t_x, u_x, width) * get_ld_dct(t_y, v_y, height)
+                dct_weights[:, i * c_part: (i+1) * c_part, t_x, t_y] = val
+
+    return dct_weights
+#---------------------------------------------------------------------
 
 class SqueezeExcite(nn.Module):
     def __init__(self, in_chs, se_ratio=0.25, reduced_base_chs=None,
                  act="ReLU", gate_fn=hard_sigmoid, divisor=4, **_):
         super(SqueezeExcite, self).__init__()
+
         self.gate_fn = gate_fn
         reduced_chs = _make_divisible((reduced_base_chs or in_chs) * se_ratio, divisor)
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
@@ -57,6 +81,7 @@ class SqueezeExcite(nn.Module):
         self.conv_expand = nn.Conv2d(reduced_chs, in_chs, 1, bias=True)
 
     def forward(self, x):
+  
         x_se = self.avg_pool(x)
         x_se = self.conv_reduce(x_se)
         x_se = self.act1(x_se)
@@ -194,11 +219,11 @@ class GhostNet(nn.Module):
              ],                       # 6  1/16
             # stage5
             [[5, 672, 160, 0.25, 2]], # 7
-            [[5, 960, 160, 0, 1],
-             [5, 960, 160, 0.25, 1],
-             [5, 960, 160, 0, 1],
-             [5, 960, 160, 0.25, 1]
-             ]                        # 8
+            # [[5, 960, 160, 0, 1],
+            #  [5, 960, 160, 0.25, 1],
+            #  [5, 960, 160, 0, 1],
+            #  [5, 960, 160, 0.25, 1]
+            #  ]                        # 8
             
             
             
@@ -254,14 +279,29 @@ class GhostNet(nn.Module):
         x = self.bn1(x)
         x = self.act1(x)
         output = []
-        for i in range(10):
+        #for i in range(10):
+        for i in range(8):
             x = self.blocks[i](x)
             if i in self.out_stages:
                 output.append(x)
-                #print("ghost output:",x.shape)
+            #print("ghost output:",x.shape)
+            #print("----------------------------------------------------")
                 # ghost output: torch.Size([80, 40, 40, 40])
                 # ghost output: torch.Size([80, 112, 20, 20])
                 # ghost output: torch.Size([80, 960, 10, 10])
+                
+# |    |    └─Sequential: 3-1                        [-1, 16, 160, 160]        464
+# |    |    └─Sequential: 3-2                        [-1, 24, 80, 80]          2,564
+# |    |    └─Sequential: 3-3                        [-1, 24, 80, 80]          2,352
+# |    |    └─Sequential: 3-4                        [-1, 40, 40, 40]          9,636
+# |    |    └─Sequential: 3-5                        [-1, 40, 40, 40]          13,672
+# |    |    └─Sequential: 3-6                        [-1, 80, 20, 20]          22,920
+# |    |    └─Sequential: 3-7                        [-1, 112, 20, 20]         533,476
+# |    |    └─Sequential: 3-8                        [-1, 160, 10, 10]         362,840
+# |    |    └─Sequential: 3-9                        [-1, 160, 10, 10]         1,567,520
+# |    |    └─Sequential: 3-10                       [-1, 960, 10, 10]         155,520
+
+
 
         return tuple(output)
 

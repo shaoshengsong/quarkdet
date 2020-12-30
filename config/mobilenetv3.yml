@@ -1,20 +1,14 @@
 #Config File example
-save_dir: workspace/ghostnet
+save_dir: workspace/mobilenet
 model:
   detector:
     name: GFL
     backbone:
-
-      name: GhostNet 
-      width_mult: 1.0
-      #out_stages: [4, 6, 9] 
-      out_stages: [4, 6, 7] 
-      act: ReLU
-
+      name: MobileNetV3_Small 
+      out_stages: [2,6] 
     neck:
       name: PAN
-      #in_channels: [40, 112, 960]
-      in_channels: [40, 112, 160]
+      in_channels: [24, 48, 576] 
       out_channels: 96
       start_level: 0
       num_outs: 3
@@ -71,12 +65,12 @@ data:
     pipeline:
       normalize: [[103.53, 116.28, 123.675], [57.375, 57.12, 58.395]]
 device:
-  gpu_ids: [0,1]
-  workers_per_gpu: 16 #8
+  gpu_ids: [1]
+  workers_per_gpu:  8
   batchsize_per_gpu: 80 # 80 #40 #160 santiago test
 schedule:
   resume: False
-  load_model: ./workspace/ghostnet/model_last.pth
+  load_model: ./workspace/mobilenet/model_last.pth
 
   optimizer:
     name: SGD
@@ -85,20 +79,20 @@ schedule:
     weight_decay: 0.0001
   warmup:
     name: linear
-    steps: 100 #300 #santiago test
+    steps: 300 #santiago test
     ratio: 0.1
   total_epochs: 160 #70
   lr_schedule:
     name: MultiStepLR
-    milestones: [30,80,130,150,155,160]
+    milestones: [130,160,150,155]
     gamma: 0.1
-  val_intervals: 5
+  val_intervals: 5 #5
 evaluator:
   name: CocoDetectionEvaluator
   save_key: mAP
 
 log:
-  interval: 10 #10
+  interval: 10
 
 class_names: ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
               'train', 'truck', 'boat', 'traffic_light', 'fire_hydrant',
@@ -177,23 +171,3 @@ class_names: ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
 # 		[0., 0., 1.]
 # 	])]
 # }
-
-
-
-# ghostnet精简版本
-# 对GhostNet做了以下精简
-# 取出stage5中expansion size等于960的所有层，去除的层还包括
-# Conv2d 1×1 the number of output channels等于960和1280的层，平均池化层和最后的全连接层
-
-# Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.198
-# Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.339
-# Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.198
-# Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.059
-# Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.197
-# Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.323
-# Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.211
-# Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.340
-# Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.362
-# Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.105
-# Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.410
-# Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.583

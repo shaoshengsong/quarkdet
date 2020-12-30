@@ -1,3 +1,8 @@
+
+#note: It is according to 《Generalized Focal Loss: Learning Qualified and Distributed Bounding Boxes for Dense Object Detection》
+#(custom changed,it is not Generalized Focal LossV2)
+
+
 from functools import partial
 import torch
 import torch.nn as nn
@@ -59,18 +64,8 @@ class Integral(nn.Module):
         return x
 
 
-class GFLHead(AnchorHead):
-    """Generalized Focal Loss: Learning Qualified and Distributed Bounding
-    Boxes for Dense Object Detection.
-
-    GFL head structure is similar with ATSS, however GFL uses
-    1) joint representation for classification and localization quality, and
-    2) flexible General distribution for bounding box locations,
-    which are supervised by
-    Quality Focal Loss (QFL) and Distribution Focal Loss (DFL), respectively
-
-    https://arxiv.org/abs/2006.04388
-
+class GFLHeadV2(AnchorHead):
+    """
     Args:
         num_classes (int): Number of categories excluding the background
             category.
@@ -99,8 +94,14 @@ class GFLHead(AnchorHead):
                  octave_base_scale=4,
                  scales_per_octave=1,
                  conv_cfg=None,
-                 norm_cfg=dict(type='GN', num_groups=32, requires_grad=True),
-                 reg_max=16,
+                 norm_cfg=dict(type='BN', num_groups=32, requires_grad=True),
+                 reg_max=7,
+                 
+                 #santiago
+                 reg_topk=4,
+                 reg_channels=40, #64
+                 add_mean=True,
+                 #-------------------------------------------------------------------------
                  **kwargs):
         self.stacked_convs = stacked_convs
         self.octave_base_scale = octave_base_scale
@@ -109,15 +110,29 @@ class GFLHead(AnchorHead):
         self.conv_cfg = conv_cfg
         self.norm_cfg = norm_cfg
         self.reg_max = reg_max
-        use_sigmoid = True
+        
+        #santiago
+        self.reg_topk = reg_topk
+        self.reg_channels = reg_channels
+        self.add_mean = add_mean
+        self.total_dim = reg_topk
+        if add_mean:
+            self.total_dim += 1
+        print('total dim = ', self.total_dim * 4)
+        #-------------------------------------------------------------------------
+ 
         octave_scales = np.array(
             [2 ** (i / scales_per_octave) for i in range(scales_per_octave)])
         anchor_scales = octave_scales * octave_base_scale
-        super(GFLHead, self).__init__(
-            num_classes, loss, use_sigmoid, input_channel, anchor_scales=anchor_scales, **kwargs)
+        print("anchor_scales:",anchor_scales)
+        super(GFLHeadV2, self).__init__(
+            num_classes, loss, use_sigmoid=True,input_channel=input_channel, anchor_scales=anchor_scales, **kwargs)
+        
+            #     super(GFLHeadV2, self).__init__(
+            # num_classes, loss, use_sigmoid, input_channel, anchor_scales=anchor_scales, **kwargs)
 
         self.distribution_project = Integral(self.reg_max)
-        self.loss_qfl = QualityFocalLoss(use_sigmoid=True, beta=2.0, loss_weight=1.0)
+        self.loss_qfl = QualityFocalLoss(use_sigmoid=True, beta=2.0, loss_weight=1.0)#santiago
         self.loss_dfl = DistributionFocalLoss(loss_weight=0.25)
         self.loss_bbox = GIoULoss(loss_weight=2.0)
         self.init_weights()
@@ -154,12 +169,25 @@ class GFLHead(AnchorHead):
         self.gfl_reg = nn.Conv2d(
             self.feat_channels, 4 * (self.reg_max + 1), 3, padding=1)
         self.scales = nn.ModuleList([Scale(1.0) for _ in self.anchor_strides])
+        
+        #santiago
+        conf_vector = [nn.Conv2d(4 * self.total_dim, self.reg_channels, 1)]
+        conf_vector += [self.relu]
+        conf_vector += [nn.Conv2d(self.reg_channels, 1, 1), nn.Sigmoid()]
+        #-----------------------------------------------------------------------
+
+        self.reg_conf = nn.Sequential(*conf_vector)
 
     def init_weights(self):
         for m in self.cls_convs:
             normal_init(m.conv, std=0.01)
         for m in self.reg_convs:
             normal_init(m.conv, std=0.01)
+        #santiago    
+        for m in self.reg_conf:
+            if isinstance(m, nn.Conv2d):
+                normal_init(m, std=0.01)
+        #-----------------------------------------------------------------------        
         bias_cls = -4.595
         normal_init(self.gfl_cls, std=0.01, bias=bias_cls)
         normal_init(self.gfl_reg, std=0.01)
@@ -174,8 +202,25 @@ class GFLHead(AnchorHead):
             cls_feat = cls_conv(cls_feat)
         for reg_conv in self.reg_convs:
             reg_feat = reg_conv(reg_feat)
-        cls_score = self.gfl_cls(cls_feat)
+        #cls_score = self.gfl_cls(cls_feat) santiago
         bbox_pred = scale(self.gfl_reg(reg_feat)).float()
+        #santiago
+        N, C, H, W = bbox_pred.size()
+        prob = F.softmax(bbox_pred.reshape(N, 4, self.reg_max+1, H, W), dim=2)
+        prob_topk, _ = prob.topk(self.reg_topk, dim=2)
+
+        if self.add_mean:
+            stat = torch.cat([prob_topk, prob_topk.mean(dim=2, keepdim=True)],
+                             dim=2)
+        else:
+            stat = prob_topk
+
+        quality_score = self.reg_conf(stat.reshape(N, -1, H, W))
+        cls_score = self.gfl_cls(cls_feat).sigmoid() * quality_score
+        #-----------------------------------------------------------------------    
+        
+        
+        
         return cls_score, bbox_pred
 
     def anchor_center(self, anchors):
@@ -196,6 +241,7 @@ class GFLHead(AnchorHead):
 
         # FG cat_id: [0, num_classes -1], BG cat_id: num_classes
         bg_class_ind = self.num_classes
+        #print("bg_class_ind:",bg_class_ind)
         pos_inds = torch.nonzero((labels >= 0)
                                  & (labels < bg_class_ind), as_tuple=False).squeeze(1)
 
@@ -207,8 +253,12 @@ class GFLHead(AnchorHead):
             pos_anchors = anchors[pos_inds]
             pos_anchor_centers = self.anchor_center(pos_anchors) / stride
 
-            weight_targets = cls_score.detach().sigmoid()
+            #weight_targets = cls_score.detach()
+            
+            weight_targets = cls_score.detach().sigmoid() #santiago
+            #print("weight_targets 1:",weight_targets)
             weight_targets = weight_targets.max(dim=1)[0][pos_inds]
+            #print("weight_targets 2:",weight_targets)
             pos_bbox_pred_corners = self.distribution_project(pos_bbox_pred)
             pos_decode_bbox_pred = distance2bbox(pos_anchor_centers,
                                                  pos_bbox_pred_corners)
@@ -253,6 +303,11 @@ class GFLHead(AnchorHead):
              gt_meta
              ):
         cls_scores, bbox_preds = preds
+ 
+        # print("preds1---------------------------------")
+        # print(cls_scores)
+        # print("preds2---------------------------------")
+        # print(bbox_preds)
 
         gt_bboxes = gt_meta['gt_bboxes']
         gt_labels = gt_meta['gt_labels']
@@ -303,9 +358,14 @@ class GFLHead(AnchorHead):
         avg_factor = sum(avg_factor)
         avg_factor = reduce_mean(avg_factor).item()
         if avg_factor <= 0:
-            loss_qfl = torch.tensor(0, dtype=torch.float32, requires_grad=True).cuda()
-            loss_bbox = torch.tensor(0, dtype=torch.float32, requires_grad=True).cuda()
-            loss_dfl = torch.tensor(0, dtype=torch.float32, requires_grad=True).cuda()
+            loss_qfl = torch.tensor(0, dtype=torch.float32).cuda()
+            loss_bbox = torch.tensor(0, dtype=torch.float32).cuda()
+            loss_dfl = torch.tensor(0, dtype=torch.float32).cuda()
+            
+            # loss_qfl = torch.tensor(0, dtype=torch.float32, requires_grad=True).cuda()
+            # loss_bbox = torch.tensor(0, dtype=torch.float32, requires_grad=True).cuda()
+            # loss_dfl = torch.tensor(0, dtype=torch.float32, requires_grad=True).cuda()
+            
         else:
             losses_bbox = list(map(lambda x: x / avg_factor, losses_bbox))
             losses_dfl = list(map(lambda x: x / avg_factor, losses_dfl))
@@ -396,8 +456,13 @@ class GFLHead(AnchorHead):
         for stride, cls_score, bbox_pred, anchors in zip(
                 self.anchor_strides, cls_scores, bbox_preds, mlvl_anchors):
             assert cls_score.size()[-2:] == bbox_pred.size()[-2:]
+            
             scores = cls_score.permute(1, 2, 0).reshape(
                 -1, self.cls_out_channels).sigmoid()
+            #santiago
+            # scores = cls_score.permute(1, 2, 0).reshape(
+            #     -1, self.cls_out_channels)
+                        
             bbox_pred = bbox_pred.permute(1, 2, 0)
             bbox_pred = self.distribution_project(bbox_pred) * stride
 
@@ -505,8 +570,13 @@ class GFLHead(AnchorHead):
                           label_channels=1,
                           unmap_outputs=True):
         device = flat_anchors.device
-        gt_bboxes = torch.from_numpy(gt_bboxes).to(device)
-        gt_labels = torch.from_numpy(gt_labels).to(device)
+        #print("gt_bboxes:",gt_bboxes.shape)
+        # gt_bboxes = torch.from_numpy(gt_bboxes).to(device)
+        # gt_labels = torch.from_numpy(gt_labels).to(device)
+        gt_bboxes = torch.tensor(gt_bboxes).to(device)
+        gt_labels = torch.tensor(gt_labels).to(device)
+        
+        
         # num_gts = gt_labels.size(0)
         # if num_gts > 0:
         #     gt_labels += 1
