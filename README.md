@@ -1,5 +1,6 @@
 # quarkdet 
 weightlight object detection<br>
+轻量级目标检测<br>
 GhostNet + PAN + GFL<br>
 
 Single-GPU<br>
@@ -21,12 +22,22 @@ backbone 支持 mobilenetv3, shufflenetv2, ghostnet<br>
 neck 支持 FPN,PAN（卷积）<br>
 head 支持 gfl<br>
 
-ghostnet精简版本<br>
+## 支持mosaic数据增强
+```
+load_mosaic=False,
+mosaic_probability=0.2
+mosaic_area=16,
+```
+load_mosaic：表示是否启动数据增强<br>
+mosaic_probability：有多少比例的数据采用mosaic数据增强<br>
+mosaic_area：GT bbox大小小于该阈值则过滤掉<br>
+
+## ghostnet精简版本
 对GhostNet做了以下精简<br>
 取出stage5中expansion size等于960的所有层，去除的层还包括<br>
 Conv2d 1×1 the number of output channels等于960和1280的层，平均池化层和最后的全连接层<br>
 
-mobilenetv3small版本<br>
+## mobilenetv3small版本
 网络从开头截取到hs2(bn2)<br>
 
 此repo代码中GFocalV2未完全更改完成，如要实现请[参考](https://github.com/implus/GFocalV2)。

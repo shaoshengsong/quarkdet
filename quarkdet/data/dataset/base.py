@@ -35,6 +35,8 @@ class BaseDataset(Dataset, metaclass=ABCMeta):
                  use_seg_mask=False,
                  use_keypoint=False,
                  load_mosaic=False,
+                 mosaic_probability=0.2,
+                 mosaic_area=16,
                  mode='train'
                  ):
         self.img_path = img_path
@@ -46,6 +48,8 @@ class BaseDataset(Dataset, metaclass=ABCMeta):
         self.use_seg_mask = use_seg_mask
         self.use_keypoint = use_keypoint
         self.load_mosaic = load_mosaic
+        self.mosaic_probability=mosaic_probability
+        self.mosaic_area=mosaic_area
         self.mode = mode
 
         self.data_info = self.get_data_info(ann_path)

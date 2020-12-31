@@ -91,8 +91,7 @@ class CocoDataset(BaseDataset):
         
         result_image[0:h,0:w] = imgs[0]
         result_image[0:h,w: w * 2] = imgs[1]
-        result_image[h:h * 2 ,0:w] = imgs[2]
-        
+        result_image[h:h * 2 ,0:w] = imgs[2]   
         result_image[h:h * 2, w:w * 2  ] = imgs[3]
         
         annots[0][:,0] *= w_scales[0]
@@ -136,7 +135,7 @@ class CocoDataset(BaseDataset):
         t_w = result_annot[:, 2] - result_annot[:, 0]
         t_h = result_annot[:, 3] - result_annot[:, 1]
         area = t_w * t_h
-        result_annot = result_annot[np.where(area>25)]
+        result_annot = result_annot[np.where(area>=self.mosaic_area)]
         
         # print("change result_annot:",np.rint(result_annot))
         # #------------------------------------------------
@@ -240,7 +239,7 @@ class CocoDataset(BaseDataset):
         #     print("original meta:",meta) 
             
             
-        if whether< 0.5:
+        if whether < self.mosaic_probability and self.load_mosaic:
             meta = self.load_data_mosaic(idx)
         else:
             meta = dict(img=img,
