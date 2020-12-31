@@ -1,5 +1,5 @@
 import copy
-from .ghostnet import GhostNet
+from .ghostnet import GhostNet_slim, GhostNet_full
 from .shufflenetv2 import ShuffleNetV2
 from .mobilenetv2 import MobileNetV2
 from .mobilenetv3 import MobileNetV3_Small
@@ -13,8 +13,11 @@ def build_backbone(cfg):
         pass
     elif name == 'ShuffleNetV2':
         return ShuffleNetV2(**backbone_cfg)
-    elif name == 'GhostNet':
-        return GhostNet(**backbone_cfg)
+    elif name == 'GhostNet_slim':
+        return GhostNet_slim(**backbone_cfg)
+    elif name == 'GhostNet_full':
+            return GhostNet_full(**backbone_cfg)
+    
     elif name == 'MobileNetV2':
         return MobileNetV2(**backbone_cfg)
     elif name == 'MobileNetV3_Small':

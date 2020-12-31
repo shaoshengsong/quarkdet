@@ -1,20 +1,18 @@
 #Config File example
-save_dir: workspace/ghostnet
+save_dir: workspace/ghostnet_full
 model:
   detector:
     name: GFL
     backbone:
 
-      name: GhostNet 
+      name: GhostNet_full 
       width_mult: 1.0
-      #out_stages: [4, 6, 9] 
-      out_stages: [4, 6, 7] 
+      out_stages: [4, 6, 9] 
       act: ReLU
 
     neck:
       name: PAN
-      #in_channels: [40, 112, 960]
-      in_channels: [40, 112, 160]
+      in_channels: [40, 112, 960]
       out_channels: 96
       start_level: 0
       num_outs: 3
@@ -34,7 +32,7 @@ model:
       loss:
         loss_qfl:
           name: QualityFocalLoss
-          use_sigmoid: False #True
+          use_sigmoid: True
           beta: 2.0
           loss_weight: 1.0
         loss_dfl:
@@ -71,12 +69,12 @@ data:
     pipeline:
       normalize: [[103.53, 116.28, 123.675], [57.375, 57.12, 58.395]]
 device:
-  gpu_ids: [0,1]
+  gpu_ids: [1]
   workers_per_gpu: 16 #8
   batchsize_per_gpu: 80 # 80 #40 #160 santiago test
 schedule:
   resume: False
-  load_model: ./workspace/ghostnet/model_last.pth
+  load_model: ./workspace/ghostnet_full/model_last.pth
 
   optimizer:
     name: SGD

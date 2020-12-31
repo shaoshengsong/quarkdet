@@ -9,7 +9,7 @@ from .gfl_head import GFLHead
 from .anchor.anchor_target import multi_apply
 
 
-class QuarkDetHead(GFLHeadV2):
+class QuarkDetHead(GFLHead): # 可以直接将GFLHead替换成 GFLHeadV2
     """
     Modified from GFL, use same loss functions but much lightweight convolution heads
     """
