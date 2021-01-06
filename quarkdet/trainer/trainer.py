@@ -126,7 +126,7 @@ class Trainer:
             del output, loss, loss_stats
         epoch_loss_dict = {k: v.avg for k, v in epoch_losses.items()}
         
-        global_loss=total_loss / num_iters
+        total_loss=total_loss / num_iters
         print("global loss result:",total_loss)    
         return results, epoch_loss_dict,total_loss #santiago
 
