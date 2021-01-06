@@ -51,6 +51,57 @@ backbone 支持 mobilenetv3, shufflenetv2, ghostnet<br>
 neck 支持 FPN,PAN（卷积）<br>
 head 支持 gfl<br>
 
+## 学习率支持 ReduceLROnPlateau
+当监控的指标连续n次数还没有改进时,降低学习率，这里的n在配置里是patience
+```
+  lr_schedule:
+    name: ReduceLROnPlateau
+    mode: 'min'
+    factor: 0.1
+    patience: 10
+    verbose: True
+    threshold: 0.00001
+    threshold_mode: 'rel'
+    cooldown: 0
+    min_lr: 0
+    eps: 1e-08 
+```
+## ghostnet_full版本训练结果
+
+Resolution=320 * 320
+epoch = 85
+```
+Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.220
+Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.369
+Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.220
+Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.069
+Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.219
+Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.366
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.219
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.347
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.369
+Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.118
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.414
+Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.591
+```
+
+## ghostnet_slim版本训练结果
+```
+Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.198
+Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.339
+Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.198
+Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.059
+Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.197
+Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.323
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.211
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.340
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.362
+Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.105
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.410
+Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.583
+```
+
+
 ## Muchas gracias.
 
 https://github.com/huawei-noah/ghostnet

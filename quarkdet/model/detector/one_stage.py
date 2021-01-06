@@ -45,5 +45,7 @@ class OneStage(nn.Module):
     def forward_train(self, gt_meta):
         preds = self(gt_meta['img'])
         loss, loss_states = self.head.loss(preds, gt_meta)
+        
+        #print("forward_train:",loss,type(loss))
 
         return preds, loss, loss_states

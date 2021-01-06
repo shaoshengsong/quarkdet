@@ -47,7 +47,7 @@ def main(args):
     evaluator = build_evaluator(cfg, val_dataset)
     logger.log('Starting testing...')
     with torch.no_grad():
-        results, val_loss_dict = trainer.run_epoch(0, val_dataloader, mode=args.task)
+        results, val_loss_dict,_ = trainer.run_epoch(0, val_dataloader, mode=args.task)
     if args.task == 'test':
         res_json = evaluator.results2json(results)
         json_path = os.path.join(cfg.save_dir, 'results{}.json'.format(timestr))
