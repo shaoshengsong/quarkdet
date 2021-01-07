@@ -47,9 +47,9 @@ device:<br>
 ```
 python -m torch.distributed.launch --nproc_per_node=2 --master_port 30001 tools/train.py config/quarkdet.yml
 ```
-backbone 支持 mobilenetv3, shufflenetv2, ghostnet<br>
-neck 支持 FPN,PAN（卷积）<br>
-head 支持 gfl<br>
+backbone 支持 mobilenetv3、shufflenetv2、ghostnet<br>
+neck 支持 FPN,PAN（卷积）、BiFPN<br>
+head 支持 gfl（Generalized Focal Loss）、gfl v2(自定义版本)<br>
 
 ## 学习率支持 ReduceLROnPlateau
 当监控的指标连续n次数还没有改进时,降低学习率，这里的n在配置里是patience

@@ -1,5 +1,5 @@
 #Config File example
-save_dir: workspace/ghostnet_full
+save_dir: workspace/ghostnet_full_bifpn
 model:
   detector:
     name: GFL
@@ -11,11 +11,13 @@ model:
       act: ReLU
 
     neck:
-      name: PAN
+      name: BiFPN
       in_channels: [40, 112, 960]
       out_channels: 96
-      start_level: 0
       num_outs: 3
+      start_level: 0
+      end_level: -1
+      stack: 3
     head:
       name: QuarkDetHead
       num_classes: 80 # 80
@@ -69,12 +71,12 @@ data:
     pipeline:
       normalize: [[103.53, 116.28, 123.675], [57.375, 57.12, 58.395]]
 device:
-  gpu_ids: [0]
-  workers_per_gpu: 8 
-  batchsize_per_gpu:  80 #40 #160 santiago test
+  gpu_ids: [1]
+  workers_per_gpu: 8
+  batchsize_per_gpu: 80 # 80 #40 #160 santiago test
 schedule:
-  resume: True
-  load_model: ./workspace/ghostnet_full/model_last.pth
+  resume: False
+  load_model: ./workspace/ghostnet_full_bifpn/model_last.pth
 
   optimizer:
     name: SGD
@@ -83,7 +85,7 @@ schedule:
     weight_decay: 0.0001
   warmup:
     name: linear
-    steps: 300 #300 #santiago test
+    steps: 300  #santiago test
     ratio: 0.1
   total_epochs: 90 
 
@@ -91,7 +93,7 @@ schedule:
     name: ReduceLROnPlateau
     mode: 'min'
     factor: 0.1
-    patience: 3 
+    patience: 3 #15
     verbose: True
     threshold: 0.00001
     threshold_mode: 'rel'
