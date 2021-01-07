@@ -3,6 +3,7 @@ from .ghostnet import GhostNet_slim, GhostNet_full
 from .shufflenetv2 import ShuffleNetV2
 from .mobilenetv2 import MobileNetV2
 from .mobilenetv3 import MobileNetV3_Small
+from .efficientnet import EfficientNet
 
 def build_backbone(cfg):
     backbone_cfg = copy.deepcopy(cfg)
@@ -22,6 +23,9 @@ def build_backbone(cfg):
         return MobileNetV2(**backbone_cfg)
     elif name == 'MobileNetV3_Small':
         return MobileNetV3_Small(**backbone_cfg)
+    elif name == 'EfficientNet':
+            return EfficientNet(**backbone_cfg)
+    
     else:
         raise NotImplementedError
 

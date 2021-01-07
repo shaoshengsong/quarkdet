@@ -1,7 +1,17 @@
-# quarkdet 
+# 轻量级目标检测 quarkdet PyTorch实现
 lightweight object detection<br>
-轻量级目标检测<br>
+
+quarkdet可以用使用以下方式<br>
+EfficientNet + BiFPN + GFL<br>
 GhostNet + PAN + GFL<br>
+GhostNet + BiFPN + GFL<br>
+MobileNetV3 + PAN + GFLv2等等<br>
+训练时将命令行换成不同的配置文件即可，配置文件在quarkdet/config文件夹中<br>
+
+关于EfficientDet原版实现是<br>
+EfficientNet + BiFPN + Box/Class Head<br>
+这里改造为<br>
+EfficientNet + BiFPN + GFL(Generalized Focal Loss)<br>
 
 ## 支持mosaic数据增强
 ```
@@ -47,7 +57,7 @@ device:<br>
 ```
 python -m torch.distributed.launch --nproc_per_node=2 --master_port 30001 tools/train.py config/quarkdet.yml
 ```
-backbone 支持 mobilenetv3、shufflenetv2、ghostnet<br>
+backbone 支持 mobilenetv3、shufflenetv2、ghostnet、efficientnet<br>
 neck 支持 FPN,PAN（卷积）、BiFPN<br>
 head 支持 gfl（Generalized Focal Loss）、gfl v2(自定义版本)<br>
 
@@ -100,7 +110,10 @@ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.105
 Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.410
 Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.583
 ```
-
+如果是分布式训练，可以在norm_cfg中<br>
+dict(type='BN', momentum=0.01,eps=1e-3, requires_grad=True)<br>
+type='BN'更改为 type='SyncBN'<br>
+因为这里没有做判断是否是分布式，所以就之间写了BN<br>
 
 ## Muchas gracias.
 
