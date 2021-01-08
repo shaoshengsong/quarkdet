@@ -1,0 +1,175 @@
+#Config File example
+save_dir: workspace/nanodet
+model:
+  detector:
+    name: GFL
+    backbone:
+      name: ShuffleNetV2 
+      out_stages: [2,3,4] 
+      activation: LeakyReLU
+      model_size: 1.0x
+    neck:
+      name: PAN_Slim
+      in_channels: [116, 232, 464] 
+      out_channels: 96
+      start_level: 0
+      num_outs: 3
+    head:
+      name: QuarkDetHead
+      num_classes: 80 # 80
+      input_channel: 96
+      feat_channels: 96
+      stacked_convs: 2
+      share_cls_reg: True #True
+      octave_base_scale: 5
+      scales_per_octave: 1
+      strides: [8, 16, 32]
+      reg_max: 7 #16 #7
+      norm_cfg:
+        type: BN
+      loss:
+        loss_qfl:
+          name: QualityFocalLoss
+          use_sigmoid: False #True
+          beta: 2.0
+          loss_weight: 1.0
+        loss_dfl:
+          name: DistributionFocalLoss
+          loss_weight: 0.25
+        loss_bbox:
+          name: GIoULoss
+          loss_weight: 2.0
+data:
+  train:
+    name: coco
+    img_path: /media/ubuntu/data/dataset/COCOv1/2017/train2017
+    ann_path: /media/ubuntu/data/dataset/COCOv1/2017/annotations/instances_train2017.json
+    input_size: [320,320] #[w,h]
+    keep_ratio: True
+    pipeline:
+      perspective: 0.0
+      scale: [0.6, 1.4]
+      stretch: [[1, 1], [1, 1]]
+      rotation: 0
+      shear: 0
+      translate: 0
+      flip: 0.5
+      brightness: 0.2
+      contrast: [0.8, 1.2]
+      saturation: [0.8, 1.2]
+      normalize: [[103.53, 116.28, 123.675], [57.375, 57.12, 58.395]]
+  val:
+    name: coco
+    img_path: /media/ubuntu/data/dataset/COCOv1/2017/val2017
+    ann_path: /media/ubuntu/data/dataset/COCOv1/2017/annotations/instances_val2017.json
+    input_size: [320,320] #[w,h]
+    keep_ratio: True
+    pipeline:
+      normalize: [[103.53, 116.28, 123.675], [57.375, 57.12, 58.395]]
+device:
+  gpu_ids: [0]
+  workers_per_gpu:  8
+  batchsize_per_gpu: 80 #
+schedule:
+  resume: False
+  load_model: ./workspace/nanodet/model_last.pth
+
+  optimizer:
+    name: SGD
+    lr: 0.14
+    momentum: 0.9
+    weight_decay: 0.0001
+  warmup:
+    name: linear
+    steps: 3 
+    ratio: 0.1
+  total_epochs: 160 #70
+  lr_schedule:
+    name: MultiStepLR
+    milestones: [40,130,160,150,155]
+    gamma: 0.1
+  val_intervals: 5 #5
+evaluator:
+  name: CocoDetectionEvaluator
+  save_key: mAP
+
+log:
+  interval: 10
+
+class_names: ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
+              'train', 'truck', 'boat', 'traffic_light', 'fire_hydrant',
+              'stop_sign', 'parking_meter', 'bench', 'bird', 'cat', 'dog',
+              'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe',
+              'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee',
+              'skis', 'snowboard', 'sports_ball', 'kite', 'baseball_bat',
+              'baseball_glove', 'skateboard', 'surfboard', 'tennis_racket',
+              'bottle', 'wine_glass', 'cup', 'fork', 'knife', 'spoon', 'bowl',
+              'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot',
+              'hot_dog', 'pizza', 'donut', 'cake', 'chair', 'couch',
+              'potted_plant', 'bed', 'dining_table', 'toilet', 'tv', 'laptop',
+              'mouse', 'remote', 'keyboard', 'cell_phone', 'microwave',
+              'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock',
+              'vase', 'scissors', 'teddy_bear', 'hair_drier', 'toothbrush']
+
+
+
+#   {
+# 	'img': tensor([
+# 		[
+# 			[
+# 				[-2.5667, -2.5667, -2.5667, ..., -2.5667, -2.5667, -2.5667],
+# 				[-2.5667, -2.5667, -2.5667, ..., -2.5667, -2.5667, -2.5667],
+# 				[-2.5667, -2.5667, -2.5667, ..., -2.5667, -2.5667, -2.5667],
+# 				..., [-2.5667, -2.5667, -2.5667, ..., -2.5667, -2.5667, -2.5667],
+# 				[-2.5667, -2.5667, -2.5667, ..., -2.5667, -2.5667, -2.5667],
+# 				[-2.5667, -2.5667, -2.5667, ..., -2.5667, -2.5667, -2.5667]
+# 			],
+
+# 			[
+# 				[-2.8013, -2.8013, -2.8013, ..., -2.8013, -2.8013, -2.8013],
+# 				[-2.8013, -2.8013, -2.8013, ..., -2.8013, -2.8013, -2.8013],
+# 				[-2.8013, -2.8013, -2.8013, ..., -2.8013, -2.8013, -2.8013],
+# 				..., [-2.8013, -2.8013, -2.8013, ..., -2.8013, -2.8013, -2.8013],
+# 				[-2.8013, -2.8013, -2.8013, ..., -2.8013, -2.8013, -2.8013],
+# 				[-2.8013, -2.8013, -2.8013, ..., -2.8013, -2.8013, -2.8013]
+# 			],
+
+# 			[
+# 				[-2.8668, -2.8668, -2.8668, ..., -2.8668, -2.8668, -2.8668],
+# 				[-2.8668, -2.8668, -2.8668, ..., -2.8668, -2.8668, -2.8668],
+# 				[-2.8668, -2.8668, -2.8668, ..., -2.8668, -2.8668, -2.8668],
+# 				..., [-2.8668, -2.8668, -2.8668, ..., -2.8668, -2.8668, -2.8668],
+# 				[-2.8668, -2.8668, -2.8668, ..., -2.8668, -2.8668, -2.8668],
+# 				[-2.8668, -2.8668, -2.8668, ..., -2.8668, -2.8668, -2.8668]
+# 			]
+# 		]
+# 	]),
+# 	'img_info': {
+# 		'license': tensor([2]),
+# 		'file_name': ['000000007616.jpg'],
+# 		'coco_url': ['http://images.cocodataset.org/train2017/000000007616.jpg'],
+# 		'height': tensor([375]),
+# 		'width': tensor([500]),
+# 		'date_captured': ['2013-11-16 19:22:23'],
+# 		'flickr_url': ['http://farm1.staticflickr.com/3/6939216_ea2aca1399_z.jpg'],
+# 		'id': tensor([7616])
+# 	},
+# 	'gt_bboxes': [array([
+# 			[193.312, 153.37599, 216.5952, 175.8784],
+# 			[110.0224, 135.4624, 208.1792, 215.2832],
+# 			[160.1216, 85.7984, 168.64641, 110.976],
+# 			[204.7232, 93.6704, 212.2048, 108.3904],
+# 			[85.414406, 148.8192, 111.8976, 167.5584],
+# 			[236.0832, 155.96161, 267.5264, 166.3424],
+# 			[1.0816001, 231.6224, 320., 277.568],
+# 			[85.4656, 148.3776, 112.22401, 168.096],
+# 			[40.7232, 109.024, 44.607998, 121.5552]
+# 		],
+# 		dtype = float32)],
+# 	'gt_labels': [array([2, 7, 9, 9, 2, 2, 2, 7, 9])],
+# 	'warp_matrix': [array([
+# 		[0.64, 0., 0.],
+# 		[0., 0.64, 40.],
+# 		[0., 0., 1.]
+# 	])]
+# }

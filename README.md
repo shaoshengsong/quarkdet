@@ -1,11 +1,24 @@
-# 轻量级目标检测 quarkdet PyTorch实现
-lightweight object detection<br>
+# PyTorch实现 轻量级目标检测 quarkdet 
+Here we implement lightweight object detection<br>
+backbone support mobilenetv3、shufflenetv2、ghostnet、efficientnet<br>
+neck support FPN（cnn）,PAN（cnn）、FPN_Slim（non-cnn），PAN_Slim（non-cnn）、BiFPN<br>
+head support gfl（Generalized Focal Loss）、gfl v2(custom)<br>
 
-quarkdet可以用使用以下方式<br>
+
+在移动端不同的设备有不同的性能，针对不同的性能可以运行不同能力的模型.该库提供了低功耗的移动端设备和性能强劲的移动设备所使用的模型。<br>
+如果模型是运行在低功耗的移动端设备，backbone可以选择shufflenetv2或者moiblenetv3等，neck选择FAN_Slim，相当于一个nanodet的实现。<br>
+如果是性能强劲的移动设备，backbone可以选择effcientnet,配置中只写了b2和b3类型，neck可以选择BiFPN，相当于一个effcientdet的实现。<br>
+
+backbone 支持 mobilenetv3、shufflenetv2、ghostnet、efficientnet<br>
+neck 支持 FPN（卷积）,PAN（卷积）、FPN_Slim（非卷积），PAN_Slim（非卷积）、BiFPN<br>
+head 支持 gfl（Generalized Focal Loss）、gfl v2(自定义版本)<br>
+
+quarkdet可以用使用以下排列组合方式<br>
 EfficientNet + BiFPN + GFL<br>
 GhostNet + PAN + GFL<br>
 GhostNet + BiFPN + GFL<br>
-MobileNetV3 + PAN + GFLv2等等<br>
+MobileNetV3 + PAN/PAN_Slim + GFLv2<br>
+ShuffleNetV2 + PAN/PAN_Slim + GFL等等可以随意组合<br>
 训练时将命令行换成不同的配置文件即可，配置文件在quarkdet/config文件夹中<br>
 
 关于EfficientDet原版实现是<br>
@@ -57,9 +70,7 @@ device:<br>
 ```
 python -m torch.distributed.launch --nproc_per_node=2 --master_port 30001 tools/train.py config/quarkdet.yml
 ```
-backbone 支持 mobilenetv3、shufflenetv2、ghostnet、efficientnet<br>
-neck 支持 FPN,PAN（卷积）、BiFPN<br>
-head 支持 gfl（Generalized Focal Loss）、gfl v2(自定义版本)<br>
+
 
 ## 学习率支持 ReduceLROnPlateau
 当监控的指标连续n次数还没有改进时,降低学习率，这里的n在配置里是patience
