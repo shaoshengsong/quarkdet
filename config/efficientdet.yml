@@ -91,15 +91,15 @@ schedule:
 
   lr_schedule:
     name: ReduceLROnPlateau
-    mode: 'min'
+    mode: min
     factor: 0.1
     patience: 2 #15
     verbose: True
     threshold: 0.00001
-    threshold_mode: 'rel'
+    threshold_mode: rel
     cooldown: 0
     min_lr: 0
-    eps: 1e-08 
+    eps: 0.000000001 #1e-08
 
   val_intervals: 10
 evaluator:

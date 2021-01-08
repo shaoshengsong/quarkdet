@@ -66,15 +66,15 @@ head 支持 gfl（Generalized Focal Loss）、gfl v2(自定义版本)<br>
 ```
   lr_schedule:
     name: ReduceLROnPlateau
-    mode: 'min'
+    mode: min
     factor: 0.1
     patience: 10
     verbose: True
     threshold: 0.00001
-    threshold_mode: 'rel'
+    threshold_mode: rel
     cooldown: 0
     min_lr: 0
-    eps: 1e-08 
+    eps: 0.000000001 #1e-08
 ```
 ## ghostnet_full版本训练结果
 
