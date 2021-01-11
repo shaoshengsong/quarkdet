@@ -125,17 +125,45 @@ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.583
 dict(type='BN', momentum=0.01,eps=1e-3, requires_grad=True)<br>
 type='BN'更改为 type='SyncBN'<br>
 因为这里没有做判断是否是分布式，所以就之间写了BN<br>
+## efficientdet
+EfficientNet + BiFPN + GFL<br>
+原来的是5个level的特征，这里减少至3个level。<br>
+自动学习率，epoch=190<br>
+```
+Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.230
+Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.369
+Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.237
+Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.078
+Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.246
+Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.357
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.236
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.377
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.397
+Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.136
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.459
+Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.609
+```
+Download<br> 
+[链接](https://pan.baidu.com/s/1-_G5wWQwCPeHaahXbfarBQ) <br> 
+提取码：hl3o <br>
+
+
+## 关于技术
+[目标检测 - Generalized Focal Loss 综述](https://blog.csdn.net/flyfish1986/article/details/110143467)
+[目标检测 - IoU和GIoU作为边框回归的损失和代码实现](https://blog.csdn.net/flyfish1986/article/details/110005818)
+[目标检测 - Neck的设计 PAN（Path Aggregation Network）](https://blog.csdn.net/flyfish1986/article/details/110520667)
+[目标检测 - Generalized Focal Loss的Anchor处理机制](https://blog.csdn.net/flyfish1986/article/details/110245329)
+其他可参考
+[目标检测 FCOS(FCOS: Fully Convolutional One-Stage Object Detection)](https://blog.csdn.net/flyfish1986/article/details/109809571)
+[目标检测 PAA 概率anchor分配算法（Probabilistic Anchor Assignment Algorithm）](https://blog.csdn.net/flyfish1986/article/details/109680310)
+[目标检测 PAA - 高斯混合模型（GMM）和期望最大化算法（EM algorithm）](https://blog.csdn.net/flyfish1986/article/details/109629048)
+
 
 ## Muchas gracias.
 
 https://github.com/huawei-noah/ghostnet
-
 https://github.com/xiaolai-sqlai/mobilenetv3
-
 https://github.com/RangiLyu/nanodet  (特别感谢)
-
 https://github.com/ultralytics/yolov5
-
 https://github.com/implus/GFocal
-
 https://github.com/implus/GFocalV2
