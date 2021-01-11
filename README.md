@@ -1,8 +1,13 @@
-# PyTorch实现 轻量级目标检测 quarkdet 
+# QuarkDet implementation lightweight object detection based on PyTorch 
+PyTorch实现轻量级目标检测<br>
 Here we implement lightweight object detection<br>
 backbone support mobilenetv3、shufflenetv2、ghostnet、efficientnet<br>
 neck support FPN（cnn）,PAN（cnn）、FPN_Slim（non-cnn），PAN_Slim（non-cnn）、BiFPN<br>
 head support gfl（Generalized Focal Loss）、gfl v2(custom)<br>
+# Test Environment
+Ubuntu18.04<br>
+PyTorch 1.7<br>
+Python 3.6<br>
 
 
 在移动端不同的设备有不同的性能，针对不同的性能可以运行不同能力的模型.该库提供了低功耗的移动端设备和性能强劲的移动设备所使用的模型。<br>
