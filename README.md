@@ -149,21 +149,21 @@ Download<br>
 
 
 ## 关于技术
-[目标检测 - Generalized Focal Loss 综述](https://blog.csdn.net/flyfish1986/article/details/110143467)
-[目标检测 - IoU和GIoU作为边框回归的损失和代码实现](https://blog.csdn.net/flyfish1986/article/details/110005818)
-[目标检测 - Neck的设计 PAN（Path Aggregation Network）](https://blog.csdn.net/flyfish1986/article/details/110520667)
-[目标检测 - Generalized Focal Loss的Anchor处理机制](https://blog.csdn.net/flyfish1986/article/details/110245329)
-其他可参考
-[目标检测 FCOS(FCOS: Fully Convolutional One-Stage Object Detection)](https://blog.csdn.net/flyfish1986/article/details/109809571)
-[目标检测 PAA 概率anchor分配算法（Probabilistic Anchor Assignment Algorithm）](https://blog.csdn.net/flyfish1986/article/details/109680310)
-[目标检测 PAA - 高斯混合模型（GMM）和期望最大化算法（EM algorithm）](https://blog.csdn.net/flyfish1986/article/details/109629048)
+[目标检测 - Generalized Focal Loss 综述](https://blog.csdn.net/flyfish1986/article/details/110143467)<br>
+[目标检测 - IoU和GIoU作为边框回归的损失和代码实现](https://blog.csdn.net/flyfish1986/article/details/110005818)<br>
+[目标检测 - Neck的设计 PAN（Path Aggregation Network）](https://blog.csdn.net/flyfish1986/article/details/110520667)<br>
+[目标检测 - Generalized Focal Loss的Anchor处理机制](https://blog.csdn.net/flyfish1986/article/details/110245329)<br>
+其他可参考<br>
+[目标检测 FCOS(FCOS: Fully Convolutional One-Stage Object Detection)](https://blog.csdn.net/flyfish1986/article/details/109809571)<br>
+[目标检测 PAA 概率anchor分配算法（Probabilistic Anchor Assignment Algorithm）](https://blog.csdn.net/flyfish1986/article/details/109680310)<br>
+[目标检测 PAA - 高斯混合模型（GMM）和期望最大化算法（EM algorithm）](https://blog.csdn.net/flyfish1986/article/details/109629048)<br>
 
 
 ## Muchas gracias.
 
-https://github.com/huawei-noah/ghostnet
-https://github.com/xiaolai-sqlai/mobilenetv3
-https://github.com/RangiLyu/nanodet  (特别感谢)
-https://github.com/ultralytics/yolov5
-https://github.com/implus/GFocal
-https://github.com/implus/GFocalV2
+https://github.com/huawei-noah/ghostnet<br>
+https://github.com/xiaolai-sqlai/mobilenetv3<br>
+https://github.com/RangiLyu/nanodet  (特别感谢)<br>
+https://github.com/ultralytics/yolov5<br>
+https://github.com/implus/GFocal<br>
+https://github.com/implus/GFocalV2<br>
