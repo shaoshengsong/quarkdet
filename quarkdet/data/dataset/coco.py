@@ -12,6 +12,7 @@ from quarkdet.util import cfg
 
 class CocoDataset(BaseDataset):
 
+
     def get_data_info(self, ann_path):
         """
         Load basic information of dataset such as image path, label and so on.
@@ -52,20 +53,20 @@ class CocoDataset(BaseDataset):
             return img
         
     def load_data_mosaic(self,idx):
-        """采用固定的中心点即4张图片，均分大小
+        """采用固定的中心点即4张图片，均分大小,支持320,416,640等宽高相同大小
         
         """
+        
 
         imgs, annots ,w_scales,h_scales = [], [], [], []
         indices = [idx] + [random.randint(0, len(self.img_ids) - 1) for _ in range(3)]
-        per_image_size=160
-        height =320
-        width = 320
+        per_image_size=int(self.mosaic_image_size/2) #160
+        height =int(self.mosaic_image_size) #320
+        width = height # 320
 
 
         index_list = []
-        for i, index in enumerate(indices):
-            #print("index:",index)    
+        for i, index in enumerate(indices):   
             index_list.append(index)
             img = self.load_image(index)
             imgs.append(img)
@@ -79,8 +80,8 @@ class CocoDataset(BaseDataset):
             w_scales.append(w_scale)
             h_scales.append(h_scale)
 
-        w = 160 
-        h = 160 
+        w = int(self.mosaic_image_size/2) #160 
+        h = w 
         imgs[0] = cv2.resize(imgs[0],(w, h))
         imgs[1] = cv2.resize(imgs[1],(w, h))
         imgs[2] = cv2.resize(imgs[2],(w, h))
@@ -222,7 +223,7 @@ class CocoDataset(BaseDataset):
         ann = self.get_img_annotation(idx)
         #print("img_ids:",len(self.img_ids))
         whether=random.random() 
-        # print("whether:",whether)  
+        
         # print("idx:",idx)  
         #把两个meta的数据都打印出来 对比
         
@@ -238,7 +239,7 @@ class CocoDataset(BaseDataset):
         #     gt_labels=ann['labels']) 
         #     print("original meta:",meta) 
             
-            
+   
         if whether < self.mosaic_probability and self.load_mosaic:
             meta = self.load_data_mosaic(idx)
         else:

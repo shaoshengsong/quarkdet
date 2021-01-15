@@ -37,7 +37,8 @@ load_mosaic=False,
 mosaic_probability=0.2
 mosaic_area=16,
 ```
-与原版mosaic数据增强不同，不是随机改变图片大小而是4张图片大小相同，<br>
+支持在文件中配置，示例文件 config/ghostnet_slim640.yml
+与原版mosaic数据增强不同，不是随机改变图片大小而是4张图片大小相同，采用固定的中心点即4张图片，均分大小,支持320,416,640等宽高相同大小<br>
 load_mosaic：表示是否启动数据增强<br>
 mosaic_probability：有多少比例的数据采用mosaic数据增强<br>
 mosaic_area：GT bbox大小小于该阈值则过滤掉<br>
@@ -59,23 +60,28 @@ Conv2d 1×1 the number of output channels等于960和1280的层，平均池化�
 ## mobilenetv3small版本
 网络从开头截取到hs2(bn2)<br>
 
-## 使用方法
-Single-GPU<br>
+## 训练方法
+Single-GPU配置<br>
 quarkdet.yml config example<br>
 device:<br>
 &emsp; gpu_ids: [0]<br>
+### 单卡GPU训练命令
 ```
 python tools/train.py config/quarkdet.yml
 ```
-Multi-GPU<br>
+Multi-GPU配置<br>
 quarkdet.yml config example<br>
 device:<br>
 &emsp; gpu_ids: [0,1]<br>
-
+### 多卡GPU训练命令
 ```
 python -m torch.distributed.launch --nproc_per_node=2 --master_port 30001 tools/train.py config/quarkdet.yml
 ```
-
+## Inference video
+可用于演示<br>
+```
+python ./demo/demo.py  'video' --path /media/ubuntu/data/1.mp4 --config config/efficientdet.yml --model ./workspace/efficientdet/model_best/model_best.pth
+```
 
 ## 学习率支持 ReduceLROnPlateau
 当监控的指标连续n次数还没有改进时,降低学习率，这里的n在配置里是patience
@@ -112,6 +118,8 @@ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.591
 ```
 
 ## ghostnet_slim版本训练结果
+Computational complexity:       0.56 GFLOPs<br>
+Number of parameters:           1.77 M  <br>
 ```
 Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.198
 Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.339
@@ -149,7 +157,7 @@ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.459
 Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.609
 ```
 Download<br> 
-[链接](https://pan.baidu.com/s/1-_G5wWQwCPeHaahXbfarBQ) <br> 
+[efficientdet-b2模型下载链接](https://pan.baidu.com/s/1-_G5wWQwCPeHaahXbfarBQ) <br> 
 提取码：hl3o <br>
 
 

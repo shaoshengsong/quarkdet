@@ -24,6 +24,7 @@ class BaseDataset(Dataset, metaclass=ABCMeta):
     :param use_keypoint: load pose keypoint data
     :param load_mosaic: using mosaic data augmentation from yolov4
     :param mode: train or val or test
+    :param mosaic_image_size: image size Dynamic segmentation 例如图像大小640则会分成4个320×320的图像,以配置文件为准
     """
     def __init__(self,
                  img_path,
@@ -35,8 +36,9 @@ class BaseDataset(Dataset, metaclass=ABCMeta):
                  use_seg_mask=False,
                  use_keypoint=False,
                  load_mosaic=False,
-                 mosaic_probability=0.2,
-                 mosaic_area=16,
+                 mosaic_probability= 0.3,
+                 mosaic_area =9,
+                 mosaic_image_size=320, 
                  mode='train'
                  ):
         self.img_path = img_path
@@ -50,6 +52,7 @@ class BaseDataset(Dataset, metaclass=ABCMeta):
         self.load_mosaic = load_mosaic
         self.mosaic_probability=mosaic_probability
         self.mosaic_area=mosaic_area
+        self.mosaic_image_size=mosaic_image_size
         self.mode = mode
 
         self.data_info = self.get_data_info(ann_path)
