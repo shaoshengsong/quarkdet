@@ -48,7 +48,7 @@ mosaic_area=16,
 
 
 
-Quarkdet support to configure in the file, the sample file config/ghostnet_slim640.yml and the original mosaic data enhancement is different, not randomly change the size of the picture, but 4 pictures of the same size, using a fixed center, that is, 4 pictures, equal size, support 320416640 equal width and height of the same size.<br>
+Quarkdet support to configure in the file, the sample file config/ghostnet_slim640.yml and the original mosaic data enhancement is different, not randomly change the size of the picture, but 4 pictures of the same size, using a fixed center, that is, 4 pictures, equal size, support 320 * 320,416 * 416,640 * 640 equal width and height of the same size.<br>
 Load_mosaic: indicates whether to start data enhancement.<br>
 What percentage of mosaic_probability: data is enhanced by mosaic data<br>
 If the mosaic_area:GT bbox size is less than this threshold, it will be filtered out.<br>
