@@ -1,6 +1,6 @@
 # QuarkDet implementation lightweight object detection based on PyTorch 
 
-[中文(有更多的详细资料)](./README_cn.md) [English](./README.md)
+[中文(有更多的详细资料)](./README_cn.md)  [English](./README.md)
 
 PyTorch实现轻量级目标检测<br>
 Here we implement lightweight object detection<br>

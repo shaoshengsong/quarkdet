@@ -1,6 +1,6 @@
 # QuarkDet implementation lightweight object detection based on PyTorch 
 
-[中文](./README_cn.md) [English](./README.md)
+[中文(有更多的详细资料)](./README_cn.md)  [English](./README.md)
 
 Here we implement lightweight object detection<br>
 backbone support mobilenetv3、shufflenetv2、ghostnet、efficientnet<br>
@@ -13,9 +13,13 @@ Ubuntu18.04<br>
 PyTorch 1.7<br>
 Python 3.6<br>
 
-Different devices have different performance on the mobile side, and models with different capabilities can be run according to different performance. The library provides models for low-power mobile devices and powerful mobile devices. < br >.
-If the model runs on a low-power mobile device, backbone can choose shufflenetv2 or moiblenetv3, and neck choosing FAN_Slim, is equivalent to an implementation of nanodet. < br >.
-If it is a mobile device with strong performance, backbone can choose to only write b2 and b3 types in the effcientnet, configuration, and neck can choose BiFPN, to be the equivalent of an effcientdet implementation. < br >
+
+
+Different devices have different performance on the mobile side, and models with different capabilities can be run according to different performance. The library provides models for low-power mobile devices and powerful mobile devices.<br>
+If the model runs on a low-power mobile device, backbone can choose shufflenetv2 or moiblenetv3, and neck choosing FAN_Slim, is equivalent to an implementation of nanodet.<br>
+If it is a mobile device with strong performance, backbone can choose to only write b2 and b3 types in the effcientnet, configuration, and neck can choose BiFPN, to be the equivalent of an effcientdet implementation.<br>
+
+
 
 Backbone support mobilenetv3、shufflenetv2、ghostnet、efficientnet<br>
 neck support FPN（Convolution）,PAN（Convolution）、FPN_Slim（Non-convolution），PAN_Slim（Non-convolution）、BiFPN<br>
@@ -27,7 +31,7 @@ GhostNet + PAN + GFL<br>
 GhostNet + BiFPN + GFL<br>
 MobileNetV3 + PAN/PAN_Slim + GFLv2<br>
 ShuffleNetV2 + PAN/PAN_Slim + GFL and so on.<br>
-Just change the command line to a different configuration file during training， config file in the quarkdet/config  folder<br>
+Just change the command line to a different configuration file during training， config file in the quarkdet/config folder<br>
 
 EfficientDet the original implementation is<br>
 EfficientNet + BiFPN + Box/Class Head<br>
@@ -42,17 +46,19 @@ mosaic_probability=0.2
 mosaic_area=16,
 ```
 
-Quarkdet supports configuration in files, sample file config/ghostnet_slim640.yml.
-Different from the original mosaic data enhancement, instead of randomly changing the size of four images, it uses a fixed center point, that is, four images, which are equally divided in size, and supports 320,416,640 equal width and height with the same size < br >.
-Load_mosaic: indicates whether to start data enhancement < br >.
-What percentage of mosaic_probability: data is enhanced by mosaic data < br >.
-If the mosaic_area:GT bbox size is less than this threshold, filter out < br >.
+
+
+Quarkdet support to configure in the file, the sample file config/ghostnet_slim640.yml and the original mosaic data enhancement is different, not randomly change the size of the picture, but 4 pictures of the same size, using a fixed center, that is, 4 pictures, equal size, support 320416640 equal width and height of the same size.<br>
+Load_mosaic: indicates whether to start data enhancement.<br>
+What percentage of mosaic_probability: data is enhanced by mosaic data<br>
+If the mosaic_area:GT bbox size is less than this threshold, it will be filtered out.<br>
+
 
 ## gfl v2 version
 
 Slightly different from the implementation of the official website, it can rise a little, only after the decimal point.<br>
-From class QuarkDetHead (GFLHead): # you can directly replace GFLHead with GFLHeadV2 < br ><br>
-For the original GFocalV2 implementation, please[reference](https://github.com/implus/GFocalV2)。<br>
+From class QuarkDetHead (GFLHead): # you can directly replace GFLHead with GFLHeadV2 <br>
+For the original GFocalV2 implementation, please [reference](https://github.com/implus/GFocalV2)。<br>
 
 # GhostNet is divided into full version and simplified version.
 
@@ -61,8 +67,8 @@ ghostnet_full.yml full network version
 ghostnet_slim.yml simplified network version
 
 GhostNet  following streamlines have been made<br>
-Remove all the layers in the stage5 whose expansion size is equal to 960. the removed layers also include < br >.
-Conv2d 1 × 1 the number of output channels equals 960 and 1280 layers, average pooling layer and last fully connected layer < br >
+Remove all the layers in the stage5 whose expansion size is equal to 960. the removed layers also include <br>.
+Conv2d 1 × 1 the number of output channels equals 960 and 1280 layers, average pooling layer and last fully connected layer <br>
 
 ## mobilenetv3small version
 
